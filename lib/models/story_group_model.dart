@@ -19,9 +19,7 @@ class StoryGroup {
     // for backup
     if (index >= stories.length) {
       index = stories.length - 1;
-      print('crashed actually');
-    } else if (index <= 0) {
-      print('crashed actually');
+    } else if (index < 0) {
       index = 0;
     }
     return stories[index];

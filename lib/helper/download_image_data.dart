@@ -10,7 +10,7 @@ Future<Uint8List> downloadImageData(String fileId) async {
     if (imageCache.containsKey(fileId)) {
       return imageCache.getImage(fileId)!;
     }
-    String apiKey = 'AIzaSyCpuRsGLEMsojMW1DhVhffIZZ6ccCiVjr8';
+    String apiKey = 'AIzaSyBTm9w1Ikp6StRXGNb64mOJOKF_Xi3V2Kw';
     final String apiUrl =
         'https://www.googleapis.com/drive/v3/files/$fileId?alt=media&key=$apiKey';
     final http.Response response = await http.get(Uri.parse(apiUrl));
