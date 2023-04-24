@@ -99,8 +99,13 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
   void nextStory() {
     exitAnimation();
     StoryGroup currentStoryGroup = storyGroupController.getCurrentStoryGroup();
-    currentStoryIndex = currentStoryGroup.getNextStory();
-    if (currentStoryIndex != -1) {
+    int tempCurrentStoryIndex = currentStoryGroup.getNextStory();
+    if (tempCurrentStoryIndex != -1) {
+      //just a safeguard
+      if (tempCurrentStoryIndex <
+          storyGroupController.getCurrentStoryGroup().stories.length) {
+        currentStoryIndex = tempCurrentStoryIndex;
+      }
       storyGroupController.updateStoryGroup(currentStoryGroup);
       videoPlayerController?.dispose();
       initVideoPlayerController();
@@ -113,8 +118,13 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
   void previousStory() {
     exitAnimation();
     StoryGroup currentStoryGroup = storyGroupController.getCurrentStoryGroup();
-    currentStoryIndex = currentStoryGroup.getPreviousStory();
-    if (currentStoryIndex != -1) {
+    int tempCurrentStoryIndex = currentStoryGroup.getPreviousStory();
+    if (tempCurrentStoryIndex != -1) {
+      //just a safeguard
+      if (tempCurrentStoryIndex <
+          storyGroupController.getCurrentStoryGroup().stories.length) {
+        currentStoryIndex = tempCurrentStoryIndex;
+      }
       storyGroupController.updateStoryGroup(currentStoryGroup);
       videoPlayerController?.dispose();
       initVideoPlayerController();
