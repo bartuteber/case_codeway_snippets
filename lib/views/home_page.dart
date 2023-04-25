@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:codeway_snippets/controllers/story_controller.dart';
 import 'package:codeway_snippets/controllers/story_group_controller.dart';
 import 'package:codeway_snippets/enums/media_type.dart';
+import 'package:codeway_snippets/enums/page_arrival_type.dart';
 import 'package:codeway_snippets/models/story_group_model.dart';
 import 'package:codeway_snippets/views/story_player.dart';
 import 'package:flutter/material.dart';
@@ -91,14 +92,11 @@ class HomePage extends StatelessWidget {
     StoryController storyController = Get.find();
     return GestureDetector(
       onTap: () {
-        storyGroupController.storyGroups[storyGroupIndex].newArrival = true;
+        storyGroupController.storyGroups[storyGroupIndex].arrivalType =
+            PageArrivalType.directTap;
+        storyController.nextStory(directStoryGroupIndex: storyGroupIndex);
         storyGroupController.initializePageController(
             initialPage: storyGroupIndex);
-        StoryGroup storyGroup =
-            storyGroupController.storyGroups[storyGroupIndex];
-        storyController.currentStoryIndex = storyGroup.getNextStory();
-        storyGroupController.updateStoryGroup(
-            storyGroupController.storyGroups[storyGroupIndex]);
         Get.to(() => const StoryPlayerPage(), transition: Transition.zoom);
       },
       child: Container(
@@ -134,7 +132,7 @@ class HomePage extends StatelessWidget {
                                 height: double.infinity,
                               ),
                             ),
-                            if (!storyGroup.isCompletelySeen)
+                            if (!storyGroup.isCompletelySeen())
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
                                 child: Container(
@@ -159,7 +157,7 @@ class HomePage extends StatelessWidget {
                       width: 60,
                     ),
               Container(
-                padding: storyGroup.isCompletelySeen
+                padding: storyGroup.isCompletelySeen()
                     ? const EdgeInsets.all(8)
                     : const EdgeInsets.all(13),
                 alignment: Alignment.bottomCenter,

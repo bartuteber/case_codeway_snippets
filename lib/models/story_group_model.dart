@@ -1,4 +1,7 @@
+import 'package:codeway_snippets/enums/media_type.dart';
+import 'package:codeway_snippets/enums/page_arrival_type.dart';
 import 'package:codeway_snippets/models/story_model.dart';
+import 'package:flutter/material.dart';
 
 class StoryGroup {
   final int id;
@@ -6,12 +9,12 @@ class StoryGroup {
   final List<Story> stories;
   int lastShownStoryIndex;
   int lastSeenStoryIndex;
-  bool isCompletelySeen;
   bool newArrival;
+
+  PageArrivalType arrivalType = PageArrivalType.directTap;
 
   StoryGroup({required this.id, required this.stories, required this.name})
       : lastShownStoryIndex = -1,
-        isCompletelySeen = false,
         newArrival = false,
         lastSeenStoryIndex = -1;
 
@@ -25,39 +28,59 @@ class StoryGroup {
     return stories[index];
   }
 
-  int getNextStory() {
-    int toBeShown;
-    if (newArrival) {
-      if (isCompletelySeen || lastSeenStoryIndex >= stories.length - 1) {
-        toBeShown = 0;
-        lastShownStoryIndex = 0;
-        lastSeenStoryIndex = 0;
-      } else {
-        toBeShown = lastSeenStoryIndex + 1;
-        lastSeenStoryIndex = lastShownStoryIndex = lastSeenStoryIndex + 1;
-        if (lastSeenStoryIndex >= stories.length - 1) {
-          isCompletelySeen = true;
-          lastSeenStoryIndex = lastShownStoryIndex = stories.length - 1;
-        }
-      }
-      newArrival = false;
-    } else {
-      if (lastShownStoryIndex >= stories.length - 1) {
-        isCompletelySeen = true;
-        lastSeenStoryIndex = lastShownStoryIndex = stories.length - 1;
-        return -1;
-      } else {
-        toBeShown = lastShownStoryIndex + 1;
-        lastShownStoryIndex++;
-        if (lastShownStoryIndex > lastSeenStoryIndex) {
-          lastSeenStoryIndex = lastShownStoryIndex;
-        }
-        if (lastSeenStoryIndex >= stories.length - 1) {
-          isCompletelySeen = true;
-        }
-      }
+  bool isCompletelySeen() {
+    //lastShownCheck is included just for a safeguard
+    if (lastSeenStoryIndex >= stories.length - 1 ||
+        lastShownStoryIndex >= stories.length - 1) {
+      return true;
     }
-    return toBeShown;
+    return false;
+  }
+
+  void _syncLastShownLastSeen() {
+    if (lastShownStoryIndex >= lastSeenStoryIndex) {
+      lastSeenStoryIndex = lastShownStoryIndex;
+    }
+  }
+
+  int getNextStory() {
+    switch (arrivalType) {
+      case PageArrivalType.directTap:
+        {
+          arrivalType = PageArrivalType.alreadyInside;
+          if (isCompletelySeen()) {
+            lastShownStoryIndex = 0;
+            return 0;
+          } else {
+            lastSeenStoryIndex = lastShownStoryIndex = lastSeenStoryIndex + 1;
+            return lastSeenStoryIndex;
+          }
+        }
+      case PageArrivalType.swipe:
+        {
+          arrivalType = PageArrivalType.alreadyInside;
+          if (isCompletelySeen()) {
+            return -1;
+          } else {
+            lastSeenStoryIndex = lastShownStoryIndex = lastSeenStoryIndex + 1;
+            return lastSeenStoryIndex;
+          }
+        }
+      case PageArrivalType.alreadyInside:
+        {
+          if (lastShownStoryIndex >= stories.length - 1) {
+            return -1;
+          } else {
+            lastShownStoryIndex++;
+            _syncLastShownLastSeen();
+            return lastShownStoryIndex;
+          }
+        }
+      default:
+        {
+          return 0;
+        }
+    }
   }
 
   int getPreviousStory() {

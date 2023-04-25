@@ -1,5 +1,6 @@
 import 'package:codeway_snippets/controllers/story_group_controller.dart';
 import 'package:codeway_snippets/enums/media_type.dart';
+import 'package:codeway_snippets/enums/page_arrival_type.dart';
 import 'package:codeway_snippets/models/story_group_model.dart';
 import 'package:codeway_snippets/models/story_model.dart';
 import 'package:codeway_snippets/views/home_page.dart';
@@ -96,9 +97,15 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
     animationController.reset();
   }
 
-  void nextStory() {
+  void nextStory({int? directStoryGroupIndex}) {
     exitAnimation();
-    StoryGroup currentStoryGroup = storyGroupController.getCurrentStoryGroup();
+    StoryGroup currentStoryGroup;
+    if (directStoryGroupIndex != null) {
+      currentStoryGroup =
+          storyGroupController.storyGroups[directStoryGroupIndex];
+    } else {
+      currentStoryGroup = storyGroupController.getCurrentStoryGroup();
+    }
     int tempCurrentStoryIndex = currentStoryGroup.getNextStory();
     if (tempCurrentStoryIndex != -1) {
       //just a safeguard
@@ -141,13 +148,12 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
     bool isAnyGroupLeft = false;
 
     while (tempIndex < storyGroups.length) {
-      if (!storyGroups[tempIndex].isCompletelySeen) {
+      if (!storyGroups[tempIndex].isCompletelySeen()) {
         PageController? pageController = storyGroupController.pageController;
         StoryGroup toBeShown = storyGroupController.storyGroups[tempIndex];
-        toBeShown.newArrival = true;
+        toBeShown.arrivalType = PageArrivalType.swipe;
+        currentStoryIndex = toBeShown.getNextStory();
         storyGroupController.updateStoryGroup(toBeShown);
-        currentStoryIndex =
-            storyGroupController.storyGroups[tempIndex].getNextStory();
         pageController!.animateToPage(
           tempIndex,
           duration: const Duration(milliseconds: 500),
@@ -175,13 +181,12 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
     bool isAnyGroupLeft = false;
 
     while (tempIndex >= 0) {
-      if (!storyGroups[tempIndex].isCompletelySeen) {
+      if (!storyGroups[tempIndex].isCompletelySeen()) {
         PageController? pageController = storyGroupController.pageController;
         StoryGroup toBeShown = storyGroupController.storyGroups[tempIndex];
-        toBeShown.newArrival = true;
+        toBeShown.arrivalType = PageArrivalType.swipe;
+        currentStoryIndex = toBeShown.getNextStory();
         storyGroupController.updateStoryGroup(toBeShown);
-        currentStoryIndex =
-            storyGroupController.storyGroups[tempIndex].getNextStory();
         pageController!.animateToPage(
           tempIndex,
           duration: const Duration(milliseconds: 500),

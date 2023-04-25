@@ -13,6 +13,12 @@ class StoryGroupController extends GetxController {
     update();
   }
 
+  @override
+  void onClose() {
+    pageController?.dispose();
+    super.onClose();
+  }
+
   void updateStoryGroup(StoryGroup storyGroup) {
     int index = _storyGroups.indexWhere((sg) => storyGroup.id == sg.id);
     _storyGroups[index] = storyGroup;
@@ -31,7 +37,6 @@ class StoryGroupController extends GetxController {
     List<StoryGroup> updatedStoryGroups = [];
 
     for (StoryGroup storyGroup in _storyGroups) {
-      storyGroup.isCompletelySeen = false;
       storyGroup.lastShownStoryIndex = -1;
       storyGroup.lastSeenStoryIndex = -1;
       storyGroup.newArrival = false;
