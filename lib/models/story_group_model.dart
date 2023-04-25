@@ -1,7 +1,5 @@
-import 'package:codeway_snippets/enums/media_type.dart';
 import 'package:codeway_snippets/enums/page_arrival_type.dart';
 import 'package:codeway_snippets/models/story_model.dart';
-import 'package:flutter/material.dart';
 
 class StoryGroup {
   final int id;
