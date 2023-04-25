@@ -68,7 +68,7 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
     } else {
       nextStory();
     }
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 500));
     isTapping = false;
   }
 
