@@ -5,8 +5,34 @@ import 'package:codeway_snippets/widgets/story_item.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class StoryPlayerPage extends StatelessWidget {
-  const StoryPlayerPage({super.key});
+class StoryPlayerPage extends StatefulWidget {
+  const StoryPlayerPage({super.key, required this.initialGroupIndex});
+  final int initialGroupIndex;
+
+  @override
+  State<StoryPlayerPage> createState() => _StoryPlayerPageState();
+}
+
+class _StoryPlayerPageState extends State<StoryPlayerPage> {
+  @override
+  void initState() {
+    StoryController storyController = Get.find();
+    StoryGroupController storyGroupController = Get.find();
+    storyController.nextStory(directStoryGroupIndex: widget.initialGroupIndex);
+    storyGroupController.initializePageController(
+        initialPage: widget.initialGroupIndex);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    StoryGroupController storyGroupController = Get.find();
+    StoryController storyController = Get.find();
+    storyGroupController.pageController?.dispose();
+    storyController.animationController.dispose();
+    storyController.videoPlayerController.value?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

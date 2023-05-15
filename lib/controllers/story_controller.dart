@@ -12,26 +12,38 @@ import 'dart:async';
 class StoryController extends GetxController with GetTickerProviderStateMixin {
   final StoryGroupController storyGroupController = Get.find();
   late AnimationController animationController;
-  VideoPlayerController? videoPlayerController;
+  Rx<VideoPlayerController?> videoPlayerController =
+      Rx<VideoPlayerController?>(null);
+  Future<void>? initializeVideoPlayerFuture;
   bool isPaused = false;
   bool isTapping = false;
+  var isVideoLoading = false.obs;
+
   int currentStoryIndex = 0;
 
   @override
-  void onInit() async {
+  void onInit() {
     super.onInit();
-    await initVideoPlayerController();
+    initVideoPlayerController();
     initAnimationController();
   }
 
-  Future<void> initVideoPlayerController() async {
+  void initVideoPlayerController() {
     Story currentStory = storyGroupController
         .getCurrentStoryGroup()
         .getStoryByIndex(currentStoryIndex);
     if (currentStory.mediaType == MediaType.video) {
-      videoPlayerController = VideoPlayerController.network(currentStory.url);
-      await videoPlayerController!.initialize();
-      currentStory.duration = videoPlayerController!.value.duration;
+      videoPlayerController.value =
+          VideoPlayerController.network(currentStory.url);
+      initializeVideoPlayerFuture = videoPlayerController.value!.initialize();
+      initializeVideoPlayerFuture!.then((_) {
+        currentStory.duration = videoPlayerController.value!.value.duration;
+        print(
+            "animation will start, duration: ${currentStory.duration}, name: ${currentStory.id}");
+        startAnimation(currentStory);
+        update();
+        videoPlayerController.value?.play();
+      });
     }
   }
 
@@ -39,6 +51,7 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
     animationController = AnimationController(vsync: this);
     animationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
+        print("animation ended");
         nextStory();
       }
     });
@@ -46,7 +59,8 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
 
   @override
   void onClose() {
-    videoPlayerController?.dispose();
+    videoPlayerController.value?.dispose();
+    videoPlayerController.value = null;
     animationController.dispose();
     super.onClose();
   }
@@ -74,21 +88,19 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
 
   void pauseStory() {
     isPaused = true;
-    videoPlayerController?.pause();
+    videoPlayerController.value?.pause();
     animationController.stop();
   }
 
   void resumeStory() {
     isPaused = false;
-    videoPlayerController?.play();
+    videoPlayerController.value?.play();
     animationController.forward();
   }
 
-  void startAnimation() {
-    StoryGroup currentStoryGroup = storyGroupController.getCurrentStoryGroup();
+  void startAnimation(Story story) {
     exitAnimation();
-    animationController.duration =
-        currentStoryGroup.stories[currentStoryIndex].duration;
+    animationController.duration = story.duration;
     animationController.forward();
   }
 
@@ -98,7 +110,11 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
   }
 
   void nextStory({int? directStoryGroupIndex}) {
-    exitAnimation();
+    if (directStoryGroupIndex == null) {
+      exitAnimation();
+    }
+    videoPlayerController.value?.dispose();
+    videoPlayerController.value = null;
     StoryGroup currentStoryGroup;
     if (directStoryGroupIndex != null) {
       currentStoryGroup =
@@ -113,10 +129,11 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
           storyGroupController.getCurrentStoryGroup().stories.length) {
         currentStoryIndex = tempCurrentStoryIndex;
       }
-      storyGroupController.updateStoryGroup(currentStoryGroup);
-      videoPlayerController?.dispose();
+      //storyGroupController.updateStoryGroup(currentStoryGroup);
       initVideoPlayerController();
-      update();
+      if (directStoryGroupIndex == null) {
+        update();
+      }
     } else {
       nextStoryGroup();
     }
@@ -124,6 +141,8 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
 
   void previousStory() {
     exitAnimation();
+    videoPlayerController.value?.dispose();
+    videoPlayerController.value = null;
     StoryGroup currentStoryGroup = storyGroupController.getCurrentStoryGroup();
     int tempCurrentStoryIndex = currentStoryGroup.getPreviousStory();
     if (tempCurrentStoryIndex != -1) {
@@ -132,8 +151,7 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
           storyGroupController.getCurrentStoryGroup().stories.length) {
         currentStoryIndex = tempCurrentStoryIndex;
       }
-      storyGroupController.updateStoryGroup(currentStoryGroup);
-      videoPlayerController?.dispose();
+      //storyGroupController.updateStoryGroup(currentStoryGroup);
       initVideoPlayerController();
       update();
     } else {
@@ -143,25 +161,29 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
 
   void nextStoryGroup() {
     exitAnimation();
+    videoPlayerController.value?.dispose();
+    videoPlayerController.value = null;
     int tempIndex = storyGroupController.getCurrentStoryGroupIndex() + 1;
     List<StoryGroup> storyGroups = storyGroupController.storyGroups;
     bool isAnyGroupLeft = false;
 
     while (tempIndex < storyGroups.length) {
       if (!storyGroups[tempIndex].isCompletelySeen()) {
-        PageController? pageController = storyGroupController.pageController;
         StoryGroup toBeShown = storyGroupController.storyGroups[tempIndex];
         toBeShown.arrivalType = PageArrivalType.swipe;
+        //storyGroupController.updateStoryGroup(toBeShown);
         currentStoryIndex = toBeShown.getNextStory();
-        storyGroupController.updateStoryGroup(toBeShown);
-        pageController!.animateToPage(
+        PageController? pageController = storyGroupController.pageController;
+        pageController!
+            .animateToPage(
           tempIndex,
           duration: const Duration(milliseconds: 500),
           curve: Curves.easeInOut,
-        );
+        )
+            .then((_) {
+          initVideoPlayerController();
+        });
         isAnyGroupLeft = true;
-        videoPlayerController?.dispose();
-        initVideoPlayerController();
         break;
       } else {
         tempIndex++;
@@ -170,12 +192,16 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
 
     if (!isAnyGroupLeft) {
       exitAnimation();
+      videoPlayerController.value?.dispose();
+      videoPlayerController.value = null;
       Get.to(() => const HomePage(), transition: Transition.downToUp);
     }
   }
 
   void previousStoryGroup() {
     exitAnimation();
+    videoPlayerController.value?.dispose();
+    videoPlayerController.value = null;
     int tempIndex = storyGroupController.getCurrentStoryGroupIndex() - 1;
     List<StoryGroup> storyGroups = storyGroupController.storyGroups;
     bool isAnyGroupLeft = false;
@@ -185,16 +211,18 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
         PageController? pageController = storyGroupController.pageController;
         StoryGroup toBeShown = storyGroupController.storyGroups[tempIndex];
         toBeShown.arrivalType = PageArrivalType.swipe;
+        //storyGroupController.updateStoryGroup(toBeShown);
         currentStoryIndex = toBeShown.getNextStory();
-        storyGroupController.updateStoryGroup(toBeShown);
-        pageController!.animateToPage(
+        pageController!
+            .animateToPage(
           tempIndex,
           duration: const Duration(milliseconds: 500),
           curve: Curves.easeInOut,
-        );
+        )
+            .then((_) {
+          initVideoPlayerController();
+        });
         isAnyGroupLeft = true;
-        videoPlayerController?.dispose();
-        initVideoPlayerController();
         break;
       } else {
         tempIndex--;
@@ -203,6 +231,8 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
 
     if (!isAnyGroupLeft) {
       exitAnimation();
+      videoPlayerController.value?.dispose();
+      videoPlayerController.value = null;
       Get.to(() => const HomePage(), transition: Transition.downToUp);
     }
   }

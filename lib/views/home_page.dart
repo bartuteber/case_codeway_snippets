@@ -89,15 +89,12 @@ class HomePage extends StatelessWidget {
 
   Widget _buildStoryGroupContainer(int storyGroupIndex) {
     StoryGroupController storyGroupController = Get.find();
-    StoryController storyController = Get.find();
     return GestureDetector(
       onTap: () {
         storyGroupController.storyGroups[storyGroupIndex].arrivalType =
             PageArrivalType.directTap;
-        storyController.nextStory(directStoryGroupIndex: storyGroupIndex);
-        storyGroupController.initializePageController(
-            initialPage: storyGroupIndex);
-        Get.to(() => const StoryPlayerPage(), transition: Transition.zoom);
+        Get.to(() => StoryPlayerPage(initialGroupIndex: storyGroupIndex),
+            transition: Transition.zoom);
       },
       child: Container(
         height: 250,
@@ -112,7 +109,8 @@ class HomePage extends StatelessWidget {
             children: [
               storyGroup.stories[0].mediaType == MediaType.image
                   ? FutureBuilder<Uint8List>(
-                      future: di.downloadImageData(storyGroup.stories[0].url),
+                      future: di.downloadImageData(
+                          storyGroup.stories[0].url, () {}),
                       builder: (BuildContext context,
                           AsyncSnapshot<Uint8List> snapshot) {
                         if (snapshot.connectionState ==

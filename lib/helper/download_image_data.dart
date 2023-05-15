@@ -3,20 +3,20 @@ import 'dart:typed_data';
 import 'package:codeway_snippets/helper/cache_image.dart';
 import 'package:http/http.dart' as http;
 
-Future<Uint8List> downloadImageData(String fileId) async {
+Future<Uint8List> downloadImageData(
+    String url, Function startAnimationCallback) async {
   try {
     ImageCache imageCache = ImageCache();
 
-    if (imageCache.containsKey(fileId)) {
-      return imageCache.getImage(fileId)!;
+    if (imageCache.containsKey(url)) {
+      startAnimationCallback();
+      return imageCache.getImage(url)!;
     }
-    String apiKey = 'AIzaSyAqxtvV1HS1jmOgIEi_YAv2cW7necYvIGw';
-    final String apiUrl =
-        'https://www.googleapis.com/drive/v3/files/$fileId?alt=media&key=$apiKey';
-    final http.Response response = await http.get(Uri.parse(apiUrl));
+    final http.Response response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       Uint8List imageData = base64.decode(base64.encode(response.bodyBytes));
-      imageCache.putImage(fileId, imageData);
+      imageCache.putImage(url, imageData);
+      startAnimationCallback();
       return imageData;
     } else {
       throw Exception('Failed to download image data');

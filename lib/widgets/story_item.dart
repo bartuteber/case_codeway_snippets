@@ -59,7 +59,9 @@ class StoryItem extends StatelessWidget {
               )),
           currentStory.mediaType == MediaType.image
               ? FutureBuilder<Uint8List>(
-                  future: di.downloadImageData(currentStory.url),
+                  future: di.downloadImageData(currentStory.url, () {
+                    storyController.startAnimation(currentStory);
+                  }),
                   builder: (BuildContext context,
                       AsyncSnapshot<Uint8List> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -69,7 +71,6 @@ class StoryItem extends StatelessWidget {
                     } else {
                       WidgetsBinding.instance.addPostFrameCallback((_) async {
                         await Future.delayed(const Duration(milliseconds: 300));
-                        storyController.startAnimation();
                       });
                       return GestureDetector(
                         onLongPress: () => storyController.pauseStory(),
@@ -78,7 +79,8 @@ class StoryItem extends StatelessWidget {
                             storyController.handleTap(details),
                         onVerticalDragEnd: (details) {
                           if (details.primaryVelocity! > 200) {
-                            storyController.videoPlayerController?.dispose();
+                            storyController.videoPlayerController.value
+                                ?.dispose();
                             storyController.exitAnimation();
                             Get.to(() => const HomePage(),
                                 transition: Transition.downToUp);
@@ -105,14 +107,69 @@ class StoryItem extends StatelessWidget {
                   },
                 )
               : currentStory.mediaType == MediaType.video &&
-                      storyController.videoPlayerController != null
-                  ? AspectRatio(
-                      aspectRatio: storyController
-                          .videoPlayerController!.value.aspectRatio,
-                      child:
-                          VideoPlayer(storyController.videoPlayerController!),
+                      storyController.videoPlayerController.value != null
+                  ? Stack(
+                      children: [
+                        Align(
+                            alignment: Alignment.center,
+                            child: FutureBuilder(
+                              future:
+                                  storyController.initializeVideoPlayerFuture,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.done) {
+                                  return storyController
+                                              .videoPlayerController.value !=
+                                          null
+                                      ? AspectRatio(
+                                          aspectRatio: storyController
+                                              .videoPlayerController
+                                              .value!
+                                              .value
+                                              .aspectRatio,
+                                          child: VideoPlayer(storyController
+                                              .videoPlayerController.value!),
+                                        )
+                                      : const Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                } else {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                              },
+                            )),
+                        Positioned.fill(
+                          child: GestureDetector(
+                            onLongPress: () => storyController.pauseStory(),
+                            onLongPressEnd: (_) =>
+                                storyController.resumeStory(),
+                            onTapUp: (details) =>
+                                storyController.handleTap(details),
+                            onVerticalDragEnd: (details) {
+                              if (details.primaryVelocity! > 200) {
+                                storyController.videoPlayerController.value
+                                    ?.dispose();
+                                storyController.exitAnimation();
+                                Get.to(() => const HomePage(),
+                                    transition: Transition.downToUp);
+                              }
+                            },
+                            onHorizontalDragEnd: (details) {
+                              if (details.primaryVelocity! < 0) {
+                                storyController.nextStoryGroup();
+                              } else if (details.primaryVelocity! > 0) {
+                                storyController.previousStoryGroup();
+                              }
+                            },
+                          ),
+                        ),
+                      ],
                     )
-                  : Container(),
+                  : const Center(
+                      child: CircularProgressIndicator(),
+                    ),
         ],
       ),
     );
