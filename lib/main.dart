@@ -1,6 +1,7 @@
 import 'package:codeway_snippets/utils/theme_colors.dart';
 import 'package:codeway_snippets/views/about_page.dart';
 import 'package:codeway_snippets/views/home_page.dart';
+import 'package:codeway_snippets/views/story_player.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:codeway_snippets/controllers/init_dependencies.dart' as id;
@@ -29,7 +30,11 @@ class MyApp extends StatelessWidget {
         GetPage(
             name: "/about",
             page: () => const AboutPage(),
-            transition: Transition.fadeIn)
+            transition: Transition.fadeIn),
+        GetPage(
+            name: "/story-player",
+            page: () => const StoryPlayerPage(),
+            transition: Transition.fadeIn),
       ],
     );
   }

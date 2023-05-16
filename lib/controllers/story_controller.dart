@@ -18,7 +18,7 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
   bool isPaused = false;
   bool isTapping = false;
   var isVideoLoading = false.obs;
-
+  RxBool isInStoryPlayerPage = false.obs;
   int currentStoryIndex = 0;
 
   @override
@@ -38,8 +38,6 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
       initializeVideoPlayerFuture = videoPlayerController.value!.initialize();
       initializeVideoPlayerFuture!.then((_) {
         currentStory.duration = videoPlayerController.value!.value.duration;
-        print(
-            "animation will start, duration: ${currentStory.duration}, name: ${currentStory.id}");
         startAnimation(currentStory);
         update();
         videoPlayerController.value?.play();
@@ -51,14 +49,20 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
     animationController = AnimationController(vsync: this);
     animationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        print("animation ended");
-        nextStory();
+        if (Get.currentRoute == "/StoryPlayerPage") {
+          print("is in story player: ${isInStoryPlayerPage.value}");
+          print("page: ${Get.currentRoute}");
+          nextStory();
+        } else {
+          exitAnimation();
+        }
       }
     });
   }
 
   @override
   void onClose() {
+    print("story controller disposed");
     videoPlayerController.value?.dispose();
     videoPlayerController.value = null;
     animationController.dispose();
@@ -99,9 +103,12 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
   }
 
   void startAnimation(Story story) {
-    exitAnimation();
-    animationController.duration = story.duration;
-    animationController.forward();
+    if (isInStoryPlayerPage.value) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        animationController.duration = story.duration;
+        animationController.forward();
+      });
+    }
   }
 
   void exitAnimation() {
@@ -160,6 +167,7 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
   }
 
   void nextStoryGroup() {
+    print("next story group called");
     exitAnimation();
     videoPlayerController.value?.dispose();
     videoPlayerController.value = null;
@@ -168,6 +176,7 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
     bool isAnyGroupLeft = false;
 
     while (tempIndex < storyGroups.length) {
+      print("next story group temp index: ${tempIndex}");
       if (!storyGroups[tempIndex].isCompletelySeen()) {
         StoryGroup toBeShown = storyGroupController.storyGroups[tempIndex];
         toBeShown.arrivalType = PageArrivalType.swipe;
@@ -178,7 +187,7 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
             .animateToPage(
           tempIndex,
           duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
+          curve: Curves.easeInCubic,
         )
             .then((_) {
           initVideoPlayerController();
@@ -194,6 +203,7 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
       exitAnimation();
       videoPlayerController.value?.dispose();
       videoPlayerController.value = null;
+      print("no unseen story left");
       Get.to(() => const HomePage(), transition: Transition.downToUp);
     }
   }

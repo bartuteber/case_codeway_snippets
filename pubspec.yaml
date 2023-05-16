@@ -13,6 +13,7 @@ dependencies:
   get: ^4.6.5 
   video_player:
   http: 
+  flutter_carousel_slider:
 
 dev_dependencies:
   flutter_test:

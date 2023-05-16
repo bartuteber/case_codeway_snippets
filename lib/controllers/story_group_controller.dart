@@ -25,7 +25,11 @@ class StoryGroupController extends GetxController {
   }
 
   StoryGroup getCurrentStoryGroup() {
-    int index = pageController?.page?.round() ?? 0;
+    int index = 0;
+    if (pageController?.positions.length == 1) {
+      index = pageController?.page?.round() ?? 0;
+    }
+
     return storyGroups[index];
   }
 
