@@ -9,7 +9,7 @@ import 'dart:math';
 class StoryPlayerPage extends StatefulWidget {
   const StoryPlayerPage({super.key, required this.initialGroupIndex});
 
-  final initialGroupIndex;
+  final int initialGroupIndex;
 
   @override
   State<StoryPlayerPage> createState() => _StoryPlayerPageState();
@@ -51,8 +51,8 @@ class _StoryPlayerPageState extends State<StoryPlayerPage> {
                     storyGroupController.storyGroups[groupIndex];
                 final isLeaving = (groupIndex - currentPageValue!) <= 0;
                 final t = (groupIndex - currentPageValue!);
-                final rotationY = lerpDouble(0, 30, t as double)!;
-                final maxOpacity = 0.8;
+                final rotationY = lerpDouble(0, 30, t)!;
+                const maxOpacity = 0.8;
                 final num opacity =
                     lerpDouble(0, maxOpacity, t.abs())!.clamp(0.0, maxOpacity);
                 final isPaging = opacity != maxOpacity;

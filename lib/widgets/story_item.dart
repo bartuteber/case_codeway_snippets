@@ -26,7 +26,6 @@ class StoryItem extends StatelessWidget {
                 storyController.videoPlayerController.value;
             Story currentStory =
                 currentStoryGroup.getStoryByIndex(currentStoryIndex);
-            print("rebuilded");
             return Container(
               decoration: const BoxDecoration(color: Colors.black),
               child: Stack(
@@ -38,7 +37,6 @@ class StoryItem extends StatelessWidget {
                             imageUrl: currentStory.url,
                             imageBuilder: (context, imageProvider) {
                               if (Get.currentRoute == "/StoryPlayerPage") {
-                                print("start animation");
                                 storyController.startAnimation(currentStory);
                               }
                               return Container(
@@ -51,7 +49,7 @@ class StoryItem extends StatelessWidget {
                               );
                             },
                             placeholder: (context, url) =>
-                                CircularProgressIndicator(),
+                                const CircularProgressIndicator(),
                             errorWidget: (context, url, error) =>
                                 const Icon(Icons.error),
                           ),

@@ -13,11 +13,11 @@ class AboutPage extends StatelessWidget {
         ),
         backgroundColor: Theme.of(context).colorScheme.background,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+      body: const SingleChildScrollView(
+        padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text(
               'Functional Limitations:',
               style: TextStyle(

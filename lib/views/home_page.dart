@@ -21,7 +21,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    print("home page init");
   }
 
   @override
@@ -143,10 +142,10 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               );
                             },
-                            placeholder: (context, url) =>
-                                Center(child: CircularProgressIndicator()),
+                            placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator()),
                             errorWidget: (context, url, error) =>
-                                Icon(Icons.error),
+                                const Icon(Icons.error),
                           )),
                       if (!storyGroup.isCompletelySeen())
                         ClipRRect(

@@ -88,7 +88,6 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
 
   @override
   void onClose() {
-    print("story controller disposed");
     disposeVideoController();
     animationController.dispose();
     super.onClose();
@@ -145,7 +144,6 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
   }
 
   void nextStory({int? directStoryGroupIndex}) {
-    print("next story is called");
     exitAnimation();
     disposeVideoController();
     StoryGroup currentStoryGroup;
