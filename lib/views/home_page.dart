@@ -110,7 +110,11 @@ class _HomePageState extends State<HomePage> {
         storyController.nextStory(directStoryGroupIndex: storyGroupIndex);
         storyGroupController.initializePageController(
             initialPage: storyGroupIndex);
-        Get.to(() => const StoryPlayerPage(), transition: Transition.zoom);
+        Get.to(
+            () => StoryPlayerPage(
+                  initialGroupIndex: storyGroupIndex,
+                ),
+            transition: Transition.zoom);
       },
       child: Container(
         height: 250,

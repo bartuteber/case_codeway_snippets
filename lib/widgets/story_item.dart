@@ -125,7 +125,7 @@ class StoryItem extends StatelessWidget {
                       onLongPressEnd: (_) => storyController.resumeStory(false),
                       onTapUp: (details) => storyController.handleTap(details),
                       onVerticalDragEnd: (details) {
-                        if (details.primaryVelocity! > 200) {
+                        if (details.primaryVelocity! > 100) {
                           videoPlayerController?.dispose();
                           Get.to(() => const HomePage(),
                               transition: Transition.downToUp);

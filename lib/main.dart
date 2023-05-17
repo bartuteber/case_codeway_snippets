@@ -33,7 +33,9 @@ class MyApp extends StatelessWidget {
             transition: Transition.fadeIn),
         GetPage(
             name: "/story-player",
-            page: () => const StoryPlayerPage(),
+            page: () => const StoryPlayerPage(
+                  initialGroupIndex: 0,
+                ),
             transition: Transition.fadeIn),
       ],
     );
