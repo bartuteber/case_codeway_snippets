@@ -5,4 +5,4 @@
 * If the direction is to the right, the story player exits if there is no unseen story group in that direction.
 * If the direction is to the left, the story player exits if there is no unseen story group in that direction.
 * If all the stroy groups are seen and a story groups is tapped from home screen, the story player plays the stories of that story group respectively, and exits when the story group is ended.
-### See info page of the application for more details.
+### See about page of the application for more details. Revision updates are also added to the about page
