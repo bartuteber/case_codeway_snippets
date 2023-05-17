@@ -25,7 +25,7 @@ class AboutPage extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              '- The story images are moved to Google Cloud and Google Cloud API is used for story fetching. Now, the request limits are much more comfortable.\n- Story videos are also added to Google Cloud Storage\n- Video stories are now supported\n- Cubic transition feature is added \n- Although the application is not completely bug-free, controller and state management related bugs are improved significantly for better user experience.\n - Now, cached_network_image package is used instead of manual dowloading and caching',
+              '- The story images are moved to Google Cloud and Google Cloud API is used for story fetching. Now, the request limits are much more comfortable.\n- Story videos are also added to Google Cloud Storage\n- Video stories are now supported\n- Cubic transition feature is added \n- Although the application is not completely bug-free, controller and state management related bugs are improved significantly for better user experience.\n - Now, cached_network_image package is used instead of manual dowloading and caching\n- Exit button is added to the story player',
               style: TextStyle(fontSize: 17, height: 1.5),
             ),
             SizedBox(height: 17),
