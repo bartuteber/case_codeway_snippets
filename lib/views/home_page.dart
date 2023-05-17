@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:codeway_snippets/controllers/story_controller.dart';
 import 'package:codeway_snippets/controllers/story_group_controller.dart';
@@ -8,7 +7,6 @@ import 'package:codeway_snippets/models/story_group_model.dart';
 import 'package:codeway_snippets/views/story_player.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:codeway_snippets/helper/download_image_data.dart' as di;
 import 'package:codeway_snippets/widgets/main_layout.dart';
 import 'about_page.dart';
 

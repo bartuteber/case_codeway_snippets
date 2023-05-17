@@ -111,6 +111,7 @@ class StoryItem extends StatelessWidget {
                   Positioned(
                       top: 40,
                       left: 20,
+                      right: 60,
                       child: Text(
                         currentStoryGroup.name,
                         style: const TextStyle(
@@ -139,6 +140,20 @@ class StoryItem extends StatelessWidget {
                       },
                     ),
                   ),
+                  Positioned(
+                      top: 30,
+                      right: 20,
+                      child: IconButton(
+                          onPressed: () {
+                            videoPlayerController?.dispose();
+                            Get.to(() => const HomePage(),
+                                transition: Transition.downToUp);
+                          },
+                          iconSize: 30,
+                          icon: const Icon(
+                            Icons.cancel,
+                            color: Colors.white,
+                          )))
                 ],
               ),
             );

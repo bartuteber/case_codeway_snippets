@@ -1,4 +1,3 @@
-import 'package:codeway_snippets/controllers/story_controller.dart';
 import 'package:codeway_snippets/controllers/story_group_controller.dart';
 import 'package:codeway_snippets/models/story_group_model.dart';
 import 'package:codeway_snippets/widgets/story_item.dart';
@@ -10,7 +9,6 @@ class StoryPlayerPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    StoryController storyController = Get.find();
     StoryGroupController storyGroupController = Get.find();
     return WillPopScope(
       onWillPop: () async => false,
