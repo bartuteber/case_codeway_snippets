@@ -19,6 +19,17 @@ class AboutPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
+              'Revision Updates May 17, 2023',
+              style: TextStyle(
+                  fontSize: 20, fontWeight: FontWeight.bold, height: 1.5),
+            ),
+            SizedBox(height: 8),
+            Text(
+              '- The story images are moved to Google Cloud and Google Cloud API is used for story fetching. Now, the request limits are much more comfortable.\n- Story videos are also added to Google Cloud Storage\n- Video stories are now supported\n- Cubic transition feature is added \n- Although the application is not completely bug-free, controller and state management related bugs are improved significantly for better user experience.\n - Now, cached_network_image package is used instead of manual dowloading and caching',
+              style: TextStyle(fontSize: 17, height: 1.5),
+            ),
+            SizedBox(height: 17),
+            Text(
               'Functional Limitations:',
               style: TextStyle(
                   fontSize: 20, fontWeight: FontWeight.bold, height: 1.5),
