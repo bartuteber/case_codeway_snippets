@@ -34,7 +34,11 @@ class StoryGroupController extends GetxController {
   }
 
   int getCurrentStoryGroupIndex() {
-    return pageController?.page?.round() ?? 0;
+    int index = 0;
+    if (pageController?.positions.length == 1) {
+      index = pageController?.page?.round() ?? 0;
+    }
+    return index;
   }
 
   void setAllUnseen() {

@@ -14,6 +14,7 @@ dependencies:
   video_player:
   http: 
   flutter_carousel_slider:
+  cached_network_image:
 
 dev_dependencies:
   flutter_test:

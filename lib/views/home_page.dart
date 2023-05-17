@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:codeway_snippets/controllers/story_controller.dart';
 import 'package:codeway_snippets/controllers/story_group_controller.dart';
 import 'package:codeway_snippets/enums/media_type.dart';
@@ -11,8 +12,19 @@ import 'package:codeway_snippets/helper/download_image_data.dart' as di;
 import 'package:codeway_snippets/widgets/main_layout.dart';
 import 'about_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    print("home page init");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +112,6 @@ class HomePage extends StatelessWidget {
         storyController.nextStory(directStoryGroupIndex: storyGroupIndex);
         storyGroupController.initializePageController(
             initialPage: storyGroupIndex);
-        storyController.isInStoryPlayerPage.value = true;
         Get.to(() => const StoryPlayerPage(), transition: Transition.zoom);
       },
       child: Container(
@@ -115,48 +126,42 @@ class HomePage extends StatelessWidget {
           return Stack(
             children: [
               storyGroup.stories[0].mediaType == MediaType.image
-                  ? FutureBuilder<Uint8List>(
-                      future: di.downloadImageData(
-                          storyGroup.stories[0].url, () {}),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<Uint8List> snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return const Center(child: Icon(Icons.error));
-                        } else {
-                          return Stack(children: [
-                            ClipRRect(
+                  ? Stack(children: [
+                      ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: CachedNetworkImage(
+                            imageUrl: storyGroup.stories[0].url,
+                            imageBuilder: (context, imageProvider) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: imageProvider,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              );
+                            },
+                            placeholder: (context, url) =>
+                                Center(child: CircularProgressIndicator()),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
+                          )),
+                      if (!storyGroup.isCompletelySeen())
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
-                              child: Image.memory(
-                                snapshot.data!,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
+                              border: Border.all(
+                                color: const Color.fromARGB(255, 234, 255, 0),
+                                width: 7,
                               ),
                             ),
-                            if (!storyGroup.isCompletelySeen())
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: const Color.fromARGB(
-                                          255, 234, 255, 0),
-                                      width: 7,
-                                    ),
-                                  ),
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                ),
-                              ),
-                          ]);
-                        }
-                      },
-                    )
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ),
+                    ])
                   : Image.asset(
                       'assets/codeway_logo.png',
                       width: 60,

@@ -23,12 +23,7 @@ class StoryPlayerPage extends StatelessWidget {
             itemBuilder: (BuildContext context, int groupIndex) {
               StoryGroup currentStoryGroup =
                   storyGroupController.storyGroups[groupIndex];
-              return GetBuilder<StoryController>(
-                init: storyController,
-                builder: (storyController) {
-                  return StoryItem(currentStoryGroup: currentStoryGroup);
-                },
-              );
+              return StoryItem(currentStoryGroup: currentStoryGroup);
             },
           ),
         ),
